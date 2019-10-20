@@ -1,13 +1,13 @@
 def consolidate_cart(cart)
   new_cart = {}
-  cart.each do |ingredient|
-    if new_cart[ingredient.keys[0]]
-      new_cart[ingredient.keys[0]][:count] += 1
+  cart.each do |item|
+    if new_cart[item.keys[0]]
+      new_cart[item.keys[0]][:count] += 1
     else
-      new_cart[ingredient.keys[0]] = {
+      new_cart[item.keys[0]] = {
         count: 1,
-        price: ingredient.values[0][:price],
-        clearance: ingredient.values[0][:clearance]
+        price: item.values[0][:price],
+        clearance: item.values[0][:clearance]
       }
     end
   end
@@ -16,19 +16,19 @@ end
 
 def apply_coupons(cart, coupons)
   coupons.each do |coupon|
-    if cart.keys.include? coupon[:ingredient]
-      if cart[coupon[:ingredient]][:count] >= coupon[:num]
-        new_name = "#{coupon[:ingredient]} W/COUPON"
+    if cart.keys.include? coupon[:item]
+      if cart[coupon[:item]][:count] >= coupon[:num]
+        new_name = "#{coupon[:item]} W/COUPON"
         if cart[new_name]
           cart[new_name][:count] += coupon[:num]
         else
           cart[new_name] = {
             count: coupon[:num],
             price: coupon[:cost]/coupon[:num],
-            clearance: cart[coupon[:ingredient]][:clearance]
+            clearance: cart[coupon[:item]][:clearance]
           }
         end
-        cart[coupon[:ingredient]][:count] -= coupon[:num]
+        cart[coupon[:item]][:count] -= coupon[:num]
       end
     end
   end
@@ -36,9 +36,9 @@ def apply_coupons(cart, coupons)
 end
 
 def apply_clearance(cart)
-  cart.keys.each do |ingredient|
-    if cart[ingredient][:clearance]
-      cart[ingredient][:price] = (cart[ingredient][:price]*0.80).round(2)
+  cart.keys.each do |item|
+    if cart[item][:clearance]
+      cart[item][:price] = (cart[item][:price]*0.80).round(2)
     end
   end
   cart
@@ -50,8 +50,8 @@ def checkout(cart, coupons)
   cart_with_discounts_applied = apply_clearance(cart_with_coupons_applied)
 
   total = 0.0
-  cart_with_discounts_applied.keys.each do |ingredient|
-    total += cart_with_discounts_applied[ingredient][:price]*cart_with_discounts_applied[ingredient][:count]
+  cart_with_discounts_applied.keys.each do |item|
+    total += cart_with_discounts_applied[item][:price]*cart_with_discounts_applied[item][:count]
   end
   total > 100.00 ? (total * 0.90).round : total
 end
